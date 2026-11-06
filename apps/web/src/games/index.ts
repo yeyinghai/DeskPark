@@ -51,6 +51,13 @@ export const GAME_UIS: GameUI[] = [
     people: '4 人 · 2v2',
   },
   {
+    id: 'shuangsheng',
+    Board: lazy(() => import('./shuangsheng/ShuangshengBoard')),
+    tint: ['#9a4a3a', '#5a2620'],
+    showcase: [c(1, 'J', 17), c(2, 'H', 2), c(3, 'H', 2)],
+    people: '4 人 · 2v2',
+  },
+  {
     id: 'texas',
     Board: lazy(() => import('./texas/TexasBoard')),
     tint: ['#2f6b55', '#163c30'],
