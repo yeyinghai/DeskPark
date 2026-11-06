@@ -3,14 +3,14 @@
 闲亭是**一个 Node 进程**：它同时提供网页、WebSocket 联机服务（`/ws`）和健康检查（`/healthz`）。
 推荐用 Docker 部署：镜像基于 node:22-alpine，应用本身不到 1 MB，空闲内存占用约 50 MB，1 核 1 GB 的轻量服务器即可。
 
-- 镜像：`ghcr.io/solitern/deskpark`（`latest` 跟随 main 分支；发版标签如 `0.3.0`；`sha-xxxxxxx` 对应每次提交）
+- 镜像：`ghcr.io/yeyinghai/deskpark`（`latest` 跟随 main 分支；发版标签如 `0.3.0`；`sha-xxxxxxx` 对应每次提交）
 - 架构：`linux/amd64`、`linux/arm64`
 - 每次推送到 main，GitHub Actions 会构建镜像、启动容器做冒烟测试，通过后再发布。
 
 ## 一、最快上手（本机或任意服务器）
 
 ```bash
-git clone https://github.com/solitern/DeskPark.git
+git clone https://github.com/yeyinghai/DeskPark.git
 cd DeskPark
 cp .env.example .env
 docker compose pull && docker compose up -d
@@ -75,14 +75,14 @@ location / {
 
 ## 四、日常运维
 
-| 操作                  | 命令                                                                                      |
-| --------------------- | ----------------------------------------------------------------------------------------- |
-| 更新到最新版          | `docker compose pull && docker compose up -d`                                             |
-| 固定 / 回滚到某个版本 | `.env` 中设置 `DESKPARK_IMAGE=ghcr.io/solitern/deskpark:0.3.0`，再 `docker compose up -d` |
-| 查看日志              | `docker compose logs -f deskpark`                                                         |
-| 查看状态与健康检查    | `docker compose ps`、`curl localhost:8787/healthz`                                        |
-| 停止                  | `docker compose down`                                                                     |
-| 清理旧镜像            | `docker image prune -f`                                                                   |
+| 操作                  | 命令                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| 更新到最新版          | `docker compose pull && docker compose up -d`                                              |
+| 固定 / 回滚到某个版本 | `.env` 中设置 `DESKPARK_IMAGE=ghcr.io/yeyinghai/deskpark:0.3.0`，再 `docker compose up -d` |
+| 查看日志              | `docker compose logs -f deskpark`                                                          |
+| 查看状态与健康检查    | `docker compose ps`、`curl localhost:8787/healthz`                                         |
+| 停止                  | `docker compose down`                                                                      |
+| 清理旧镜像            | `docker image prune -f`                                                                    |
 
 启用了 HTTPS 叠加配置时，以上命令都要带上两个 `-f` 参数，例如：
 
@@ -109,18 +109,18 @@ docker compose -f docker-compose.yml -f deploy/docker-compose.https.yml up -d
 
 ## 六、配置项
 
-| 变量              | 默认值                             | 说明                                                            |
-| ----------------- | ---------------------------------- | --------------------------------------------------------------- |
-| `HTTP_PORT`       | `8787`                             | 对外端口                                                        |
-| `HTTP_BIND`       | `0.0.0.0`                          | 监听地址；配合 HTTPS 时设为 `127.0.0.1`                         |
-| `TURN_TIMEOUT_MS` | `30000`                            | 联机时每一步的时限，超时由电脑代打                              |
-| `AI_PROXY`        | 开启                               | 设为 `off` 关闭 AI 接口转发（见下方「AI 人机」）                |
-| `TRUST_PROXY`     | 空                                 | 部署在反向代理之后时设为 `1`，按 X-Forwarded-For 识别真实 IP    |
-| `MAX_CONN_PER_IP` | `20`                               | 每个 IP 同时的联机连接数上限                                    |
-| `DESKPARK_IMAGE`  | `ghcr.io/solitern/deskpark:latest` | 使用的镜像与版本                                                |
-| `NPM_REGISTRY`    | 空                                 | 本地构建时使用的 npm 源                                         |
-| `VITE_SERVER_URL` | 空                                 | 网页与服务器分开部署时，网页连接的 WebSocket 地址（构建时生效） |
-| `DOMAIN`          | 空                                 | 启用 HTTPS 时的域名                                             |
+| 变量              | 默认值                              | 说明                                                            |
+| ----------------- | ----------------------------------- | --------------------------------------------------------------- |
+| `HTTP_PORT`       | `8787`                              | 对外端口                                                        |
+| `HTTP_BIND`       | `0.0.0.0`                           | 监听地址；配合 HTTPS 时设为 `127.0.0.1`                         |
+| `TURN_TIMEOUT_MS` | `30000`                             | 联机时每一步的时限，超时由电脑代打                              |
+| `AI_PROXY`        | 开启                                | 设为 `off` 关闭 AI 接口转发（见下方「AI 人机」）                |
+| `TRUST_PROXY`     | 空                                  | 部署在反向代理之后时设为 `1`，按 X-Forwarded-For 识别真实 IP    |
+| `MAX_CONN_PER_IP` | `20`                                | 每个 IP 同时的联机连接数上限                                    |
+| `DESKPARK_IMAGE`  | `ghcr.io/yeyinghai/deskpark:latest` | 使用的镜像与版本                                                |
+| `NPM_REGISTRY`    | 空                                  | 本地构建时使用的 npm 源                                         |
+| `VITE_SERVER_URL` | 空                                  | 网页与服务器分开部署时，网页连接的 WebSocket 地址（构建时生效） |
+| `DOMAIN`          | 空                                  | 启用 HTTPS 时的域名                                             |
 
 ### AI 人机与接口转发
 
