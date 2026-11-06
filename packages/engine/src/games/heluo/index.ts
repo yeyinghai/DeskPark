@@ -1,6 +1,7 @@
 import { clone } from '../../core/clone';
 import { Rng } from '../../core/rng';
 import type { GameDefinition, Seat } from '../../core/types';
+import { hlAiPrompt } from './ai';
 import { heluoBot } from './bot';
 import type { KongType, WinKind } from './scoring';
 import { kongDeltas, winDeltas } from './scoring';
@@ -733,4 +734,5 @@ export const heluogangci: GameDefinition<HlState, HlAction, HlView, HlOptions> =
   isOver: (s) => s.phase === 'matchOver',
 
   bot: heluoBot,
+  aiPrompt: hlAiPrompt,
 };

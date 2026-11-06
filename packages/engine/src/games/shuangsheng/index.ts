@@ -10,6 +10,7 @@ import type { DeclOption, Declaration } from './declare';
 import { canOverride, initialOptions, overrideOptions, parseDeclaration } from './declare';
 import type { TrickPlay } from './play';
 import { followError, leadError, throwFailure, trickWinnerIndex } from './play';
+import { ssAiPrompt } from './ai';
 
 export * from './cards';
 export * from './declare';
@@ -736,5 +737,5 @@ export const shuangsheng: GameDefinition<SsState, SsAction, SsView, SsOptions> =
   },
 
   bot: ssBot,
-  aiPrompt: () => null,
+  aiPrompt: ssAiPrompt,
 };
