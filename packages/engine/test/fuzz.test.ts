@@ -11,6 +11,7 @@ import {
   hexisle,
   highcard,
   onecard,
+  shuangsheng,
   sichuan,
   spellstones,
   texas,
@@ -164,6 +165,16 @@ describe('畸形动作模糊测试（模拟恶意联机客户端）', () => {
         5,
         texas.defaultOptions,
         ['fold', 'check', 'call', 'raise', 'allin', 'ready'],
+        seed,
+      );
+  });
+  it('双升', () => {
+    for (let seed = 1; seed <= 6; seed++)
+      fuzz(
+        shuangsheng,
+        4,
+        shuangsheng.defaultOptions,
+        ['declare', 'pass', 'bury', 'play', 'ready', 'deal', 'dealt', 'flip', 'collect'],
         seed,
       );
   });
