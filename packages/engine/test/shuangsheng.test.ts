@@ -384,4 +384,34 @@ describe('双升对局流程', () => {
     }
     expect(st.phase).toBe('roundOver');
   });
+  it('闲家上台后，新一局按上台方自己的级数打（80–115 分不升级）', { timeout: 60000 }, () => {
+    let checked = 0;
+    for (let seed = 1; seed <= 20; seed++) {
+      let st = shuangsheng.setup({ players: [], options: { startLevel: 2 }, seed });
+      const rng = new Rng(seed);
+      let round = 1;
+      for (let i = 0; i < 400000 && !shuangsheng.isOver(st); i++) {
+        if (st.round !== round) {
+          round = st.round;
+          const prev = st.history[st.history.length - 1];
+          const team = prev.side === 'dealer' ? prev.dealerTeam : 1 - prev.dealerTeam;
+          expect(st.phase).toBe('deal');
+          expect(st.dealerTeam).toBe(team);
+          expect(st.level).toBe(prev.levelsAfter[team]);
+          if (prev.side === 'defender' && prev.defenderPoints < 120) {
+            expect(prev.levelsAfter[team]).toBe(prev.levelsBefore[team]);
+            checked++;
+          }
+        }
+        const active = shuangsheng.activeSeats(st);
+        if (!active.length) {
+          st = shuangsheng.apply(st, SYSTEM_SEAT, shuangsheng.autoAdvance!(st)!.action);
+        } else {
+          const s = active[0];
+          st = shuangsheng.apply(st, s, shuangsheng.bot(shuangsheng.view(st, s), s, rng));
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
 });
