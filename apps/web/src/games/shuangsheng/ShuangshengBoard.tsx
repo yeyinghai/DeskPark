@@ -8,6 +8,7 @@ import type { GameController } from '../../lib/controller';
 import { playSound } from '../../lib/sound';
 import { CountChip, MoveZone, useSelection, useTurnCue } from '../shared/trick';
 import './shuangsheng.css';
+import { useShuangshengVoice } from './voice';
 
 type Ctl = GameController<sh.SsView, sh.SsAction>;
 
@@ -39,6 +40,7 @@ export default function ShuangshengBoard({ ctl }: { ctl: Ctl }) {
 
   const [sel, setSel] = useSelection(v.hand, `${v.round}-${v.phase}-${v.burier}`);
   useTurnCue(myTurn || myBury || myChoice);
+  useShuangshengVoice(v, players);
 
   const act = (a: sh.SsAction) => {
     const err = ctl.act(a);
@@ -113,11 +115,11 @@ export default function ShuangshengBoard({ ctl }: { ctl: Ctl }) {
     (playing && !!v.trick && v.trick.plays.length === 0 && !v.lastTrick);
 
   return (
-    <div className="ss">
+    <div className="sj">
       <div className="rotate-tip">
         <RotateCw size={12} /> 横屏体验更佳
       </div>
-      <div className="ss__info info-chips top-info">
+      <div className="sj__info info-chips top-info">
         <span className="chip">
           第 <b className="num">{v.round}</b> 局
         </span>
@@ -143,34 +145,34 @@ export default function ShuangshengBoard({ ctl }: { ctl: Ctl }) {
         </span>
       </div>
 
-      <div className="ss__seat is-left">{seatEl(left, 'left')}</div>
-      <div className="ss__seat is-right">{seatEl(right, 'right')}</div>
+      <div className="sj__seat is-left">{seatEl(left, 'left')}</div>
+      <div className="sj__seat is-right">{seatEl(right, 'right')}</div>
 
-      <div className="ss__center">
-        <div className="ss__top">{seatEl(top, 'top')}</div>
-        <div className="ss__zone is-top">
+      <div className="sj__center">
+        <div className="sj__top">{seatEl(top, 'top')}</div>
+        <div className="sj__zone is-top">
           <MoveZone move={trickMove(top)} from="top" />
         </div>
-        <div className="ss__zone is-left">
+        <div className="sj__zone is-left">
           <MoveZone move={trickMove(left)} from="left" />
         </div>
-        <div className="ss__zone is-right">
+        <div className="sj__zone is-right">
           <MoveZone move={trickMove(right)} from="right" />
         </div>
-        <div className="ss__zone is-me">
+        <div className="sj__zone is-me">
           <MoveZone move={trickMove(me)} from="bottom" />
         </div>
         {showDeclBox && <DeclBox v={v} players={players} />}
         {playing && v.throwFail && (
-          <div className="ss-throw">
+          <div className="sj-throw">
             <span>{players[v.throwFail.seat]?.name} 甩牌失败，只能出最小的一组</span>
             <CardRow cards={v.throwFail.tried} w="var(--cw-xs)" overlap={0.5} />
           </div>
         )}
       </div>
 
-      <div className="ss__me">
-        <div className="ss__myseat">
+      <div className="sj__me">
+        <div className="sj__myseat">
           <Seat
             player={players[me]}
             active={myTurn || myBury || myChoice}
@@ -242,7 +244,7 @@ export default function ShuangshengBoard({ ctl }: { ctl: Ctl }) {
         )}
       </div>
 
-      <div className="ss__hand">
+      <div className="sj__hand">
         {!spectator && (
           <Hand
             cards={v.hand}
@@ -290,18 +292,18 @@ function DeclBox({ v, players }: { v: sh.SsView; players: { name: string }[] }) 
   if (!d && !v.flipped.length) {
     if (v.phase !== 'deal' && v.phase !== 'declare') return null;
     return (
-      <div className="ss-decl">
-        <span className="ss-decl__title">
+      <div className="sj-decl">
+        <span className="sj-decl__title">
           {v.phase === 'deal' ? `发牌中 ${v.dealt}/100` : '亮主中'}
         </span>
-        <span className="ss-decl__sub">级牌 + 同色王亮主：♠♣ 配小王，♥♦ 配大王</span>
+        <span className="sj-decl__sub">级牌 + 同色王亮主：♠♣ 配小王，♥♦ 配大王</span>
       </div>
     );
   }
   return (
-    <div className="ss-decl">
+    <div className="sj-decl">
       {d && (
-        <span className="ss-decl__title">
+        <span className="sj-decl__title">
           {d.fallback
             ? `翻完底牌未定主，${players[d.seat]?.name} 坐庄打无主`
             : d.flip
@@ -314,7 +316,7 @@ function DeclBox({ v, players }: { v: sh.SsView; players: { name: string }[] }) 
       )}
       {v.flipped.length > 0 && (
         <>
-          <span className="ss-decl__sub">翻出的底牌</span>
+          <span className="sj-decl__sub">翻出的底牌</span>
           <CardRow cards={v.flipped} w="var(--cw-xs)" overlap={0.3} />
         </>
       )}
@@ -386,7 +388,7 @@ function RoundResult({
         <div className="result__sub">
           第 {r.round} 局 · 打 {lv(r.level)} · 庄家 {ctl.players[r.dealer]?.name} · {sub}
         </div>
-        <div className="ss-score">
+        <div className="sj-score">
           <div>
             <span>闲家得分</span>
             <b className="num">{r.defenderPoints}</b>
@@ -403,11 +405,11 @@ function RoundResult({
             </b>
           </div>
         </div>
-        <div className="ss-bottom">
+        <div className="sj-bottom">
           <span>底牌</span>
           <CardRow cards={r.bottom} w="var(--cw-xs)" overlap={0.4} />
         </div>
-        <div className="ss-levels">
+        <div className="sj-levels">
           {[myTeam, 1 - myTeam].map((t) => (
             <div key={t}>
               <span>

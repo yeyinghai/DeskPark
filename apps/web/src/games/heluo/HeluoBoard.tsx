@@ -8,7 +8,7 @@ import { Button, Sheet, toast } from '../../components/ui';
 import type { GameController } from '../../lib/controller';
 import { signed } from '../../lib/format';
 import { playSound } from '../../lib/sound';
-import { settings } from '../../lib/store';
+import { speak } from '../../lib/speech';
 import { useTurnCue } from '../shared/trick';
 import '../sichuan/sichuan.css';
 import './heluo.css';
@@ -36,25 +36,6 @@ const EVENT_TEXT: Record<string, string> = {
   pici: '屁次',
   zimo: '自摸',
 };
-
-/** 用系统语音报牌 / 报碰杠次（跟随「音效」开关） */
-function speak(text: string) {
-  if (!text || !settings.get().sound) return;
-  try {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    const synth = window.speechSynthesis;
-    const voices = synth.getVoices();
-    const voice =
-      voices.find((v) => v.lang === 'zh-CN') ?? voices.find((v) => v.lang.startsWith('zh'));
-    synth.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'zh-CN';
-    if (voice) u.voice = voice;
-    synth.speak(u);
-  } catch {
-    // 语音不可用时静默
-  }
-}
 
 function useWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null);
