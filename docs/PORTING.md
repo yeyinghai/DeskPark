@@ -14,7 +14,9 @@
 | 视口适配：安全区（刘海屏）、横竖屏、触摸拖选、禁止缩放                                               | 全局样式 / `index.html`                |
 | PWA manifest：手机浏览器可「添加到主屏幕」                                                           | `apps/web/public/manifest.webmanifest` |
 
-## 路线一：Capacitor 封装（推荐先做，1–2 天）
+## 路线一：Capacitor 封装（Android 已实现）
+
+> Android 已落地：`mobile/`（Capacitor 配置、图标生成脚本）+ `.github/workflows/android.yml`；外壳逻辑见 `apps/web/src/lib/appShell.ts`，原生语音见 `apps/web/src/lib/speech.ts`。下面是原始方案。
 
 把现有网页原样打包为 iOS / Android 原生应用，界面与逻辑 100% 复用。
 
