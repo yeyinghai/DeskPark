@@ -6,8 +6,9 @@ import { Avatar } from '../components/Seat';
 import { Button, IconButton, Sheet, toast } from '../components/ui';
 import { getGameUI } from '../games';
 import { useOnlineController } from '../lib/controller';
+import { isOfflineShell, openRemoteIfOnline } from '../lib/appShell';
 import { online, useOnline } from '../lib/online';
-import { copyText } from '../lib/platform';
+import { copyText, serverUrl } from '../lib/platform';
 import { inviteText, navigate } from '../lib/router';
 import { profile } from '../lib/store';
 import { OptionsForm, PlayerCountField } from './SetupSheet';
@@ -20,8 +21,18 @@ export function OnlineRoom({ code }: { code: string }) {
   const creating = code === 'NEW';
 
   useEffect(() => {
-    online.connect();
-    if (!creating) online.send({ t: 'join', code });
+    let cancelled = false;
+    const go = () => {
+      if (cancelled) return;
+      online.connect();
+      if (!creating) online.send({ t: 'join', code });
+    };
+    // App 离线版：先看服务器是否已能连上，能就切到线上版本
+    if (isOfflineShell()) void openRemoteIfOnline().then((redirected) => !redirected && go());
+    else go();
+    return () => {
+      cancelled = true;
+    };
   }, [code, creating]);
 
   useEffect(() => {
@@ -48,10 +59,15 @@ export function OnlineRoom({ code }: { code: string }) {
             <p>
               {net.status === 'offline'
                 ? '无法连接服务器'
-                : creating
-                  ? '正在创建房间…'
-                  : `正在进入房间 ${code}…`}
+                : net.status === 'reconnecting'
+                  ? '正在连接服务器…'
+                  : creating
+                    ? '正在创建房间…'
+                    : `正在进入房间 ${code}…`}
             </p>
+            {(net.status === 'offline' || net.status === 'reconnecting') && (
+              <p className="room-hint">服务器：{serverUrl()}</p>
+            )}
             {net.status === 'offline' && (
               <Button onClick={() => online.reconnectNow()}>重试</Button>
             )}

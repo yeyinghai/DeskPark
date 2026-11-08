@@ -122,6 +122,14 @@ docker compose pull && docker compose up -d     # 打开 http://服务器IP:8787
 - 绑定域名并自动 HTTPS：`docker compose -f docker-compose.yml -f deploy/docker-compose.https.yml up -d`
 - 国内网络、版本回滚、Nginx 反代、不用 Docker 的方式等，见 **[部署指南](docs/DEPLOY.md)**。
 
+### Android 应用
+
+每次推送 main，GitHub Actions 的 **Android** 工作流用 Capacitor 打包 APK（在该次运行的 Artifacts 里下载 `deskpark-android`；推送 `v*` 标签时附在 Release 上）。
+
+- 启动时探测服务器：联网就打开线上最新版本（新游戏随 Docker 更新自动生效，不用重装），连不上就进入 APK 内置的离线版，单人照常可玩。
+- 服务器地址默认 `https://deskpark.yeyhome.com:8666/`，可在仓库 Variables 设置 `ANDROID_PUBLIC_URL` / `ANDROID_SERVER_URL`，或手动运行工作流时填写。
+- 语音报牌使用手机的「文字转语音」引擎（需支持中文）。
+
 ## 项目结构
 
 ```
