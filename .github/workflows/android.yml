@@ -65,11 +65,19 @@ jobs:
         working-directory: mobile/android
         run: |
           chmod +x gradlew
-          # 发行版下载偶尔很慢：改用体积小的 -bin 包，超时放宽到 2 分钟，失败重试 3 次
+          # Gradle 发行版托管在 GitHub Releases，偶尔 504：改用 -bin 包、放宽超时，
+          # 官方地址失败时依次换腾讯云、阿里云镜像
           P=gradle/wrapper/gradle-wrapper.properties
-          sed -i 's/-all\.zip/-bin.zip/; s/^networkTimeout=.*/networkTimeout=120000/' "$P"
-          grep -q '^networkTimeout=' "$P" || echo 'networkTimeout=120000' >> "$P"
-          for i in 1 2 3; do ./gradlew --version > /dev/null && break; echo "Gradle 下载失败，第 $i 次重试"; sleep 20; done
+          sed -i 's/-all\.zip/-bin.zip/; s/^networkTimeout=.*/networkTimeout=120000/; s/^validateDistributionUrl=.*/validateDistributionUrl=false/' "$P"
+          V=$(sed -n 's/.*gradle-\([0-9.]*\)-bin\.zip/\1/p' "$P")
+          for U in \
+            "https\\://services.gradle.org/distributions/gradle-$V-bin.zip" \
+            "https\\://mirrors.cloud.tencent.com/gradle/gradle-$V-bin.zip" \
+            "https\\://mirrors.aliyun.com/gradle/distributions/v$V/gradle-$V-bin.zip"; do
+            sed -i "s#^distributionUrl=.*#distributionUrl=$U#" "$P"
+            ./gradlew --version > /dev/null && break
+            echo "Gradle 下载失败：$U"
+          done
           ./gradlew assembleDebug --no-daemon
           cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/deskpark-debug.apk"
 
