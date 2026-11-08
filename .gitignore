@@ -12,3 +12,8 @@ coverage/
 !.vscode/extensions.json
 !.vscode/settings.json
 __pycache__/
+
+# Android 封装（CI 中生成）
+mobile/android/
+mobile/assets/
+mobile/package-lock.json

@@ -1,0 +1,80 @@
+name: Android
+
+on:
+  push:
+    branches: [main, 'feat/android']
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      server_url:
+        description: 联机服务器 WebSocket 地址
+        default: wss://deskpark.yeyhome.com:8666/ws
+      public_url:
+        description: 线上网页地址（邀请链接用）
+        default: https://deskpark.yeyhome.com:8666/
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  # 可在仓库 Settings → Variables 里设置 ANDROID_SERVER_URL / ANDROID_PUBLIC_URL 覆盖
+  SERVER_URL: ${{ inputs.server_url || vars.ANDROID_SERVER_URL || 'wss://deskpark.yeyhome.com:8666/ws' }}
+  PUBLIC_URL: ${{ inputs.public_url || vars.ANDROID_PUBLIC_URL || 'https://deskpark.yeyhome.com:8666/' }}
+
+jobs:
+  apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Build web
+        run: |
+          npm ci
+          VITE_SERVER_URL="$SERVER_URL" VITE_PUBLIC_URL="$PUBLIC_URL" npm run build -w @park/web
+
+      - name: Capacitor sync
+        working-directory: mobile
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq librsvg2-bin imagemagick
+          ./make-assets.sh
+          npm install --no-audit --no-fund
+          npx cap add android
+          npx capacitor-assets generate --android \
+            --iconBackgroundColor '#1f5c4f' --splashBackgroundColor '#f4f1ea' \
+            --splashBackgroundColorDark '#f4f1ea'
+          npx cap sync android
+
+      - name: Gradle assembleDebug
+        working-directory: mobile/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/deskpark-debug.apk"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: deskpark-android
+          path: deskpark-debug.apk
+
+      - name: Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: deskpark-debug.apk

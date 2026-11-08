@@ -1,0 +1,16 @@
+{
+  "name": "deskpark-mobile",
+  "private": true,
+  "description": "闲亭 Android 封装（Capacitor），不属于 npm workspaces，只在打包 APK 时安装",
+  "scripts": {
+    "sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/core": "^8.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5"
+  }
+}

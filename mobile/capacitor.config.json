@@ -1,0 +1,11 @@
+{
+  "appId": "com.yeyinghai.deskpark",
+  "appName": "闲亭",
+  "webDir": "../apps/web/dist",
+  "android": {
+    "backgroundColor": "#f4f1ea"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}
