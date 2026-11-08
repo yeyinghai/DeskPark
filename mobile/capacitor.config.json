@@ -6,6 +6,7 @@
     "backgroundColor": "#f4f1ea"
   },
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "allowNavigation": ["deskpark.yeyhome.com"]
   }
 }

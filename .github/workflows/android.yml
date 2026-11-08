@@ -47,7 +47,7 @@ jobs:
       - name: Build web
         run: |
           npm ci
-          VITE_SERVER_URL="$SERVER_URL" VITE_PUBLIC_URL="$PUBLIC_URL" npm run build -w @park/web
+          VITE_SERVER_URL="$SERVER_URL" VITE_PUBLIC_URL="$PUBLIC_URL" VITE_REMOTE_URL="$PUBLIC_URL" npm run build -w @park/web
 
       - name: Capacitor sync
         working-directory: mobile
