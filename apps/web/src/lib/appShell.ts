@@ -5,18 +5,28 @@
  * 连不上（无网络 / 服务器维护）就使用 APK 内置的离线版本，单人模式照常可玩。
  * 普通网页构建不注入该变量，这里什么也不做。
  */
-const PROBE_TIMEOUT_MS = 2500;
+const PROBE_TIMEOUT_MS = 6000;
 
-export async function openRemoteIfOnline(): Promise<boolean> {
+function remoteTarget(): URL | null {
   const remote = import.meta.env.VITE_REMOTE_URL as string | undefined;
-  if (!remote) return false;
-  let target: URL;
+  if (!remote) return null;
   try {
-    target = new URL(remote);
+    const target = new URL(remote);
+    return location.origin === target.origin ? null : target;
   } catch {
-    return false;
+    return null;
   }
-  if (location.origin === target.origin) return false; // 已在线上版本
+}
+
+/** 当前是否为 App 内置的离线版本（可以尝试切换到线上版本） */
+export function isOfflineShell(): boolean {
+  return remoteTarget() !== null;
+}
+
+/** 服务器连得上就跳转到线上版本并返回 true；否则返回 false */
+export async function openRemoteIfOnline(): Promise<boolean> {
+  const target = remoteTarget();
+  if (!target) return false;
   if (typeof navigator !== 'undefined' && navigator.onLine === false) return false;
 
   const ctrl = new AbortController();
@@ -33,7 +43,8 @@ export async function openRemoteIfOnline(): Promise<boolean> {
   } finally {
     clearTimeout(timer);
   }
-  // 保留内置版本里的路由（如 #/room/ABCD）
-  location.replace(target.origin + target.pathname + location.hash);
+  // 保留内置版本里的路由（如 #/room/ABCD）；「新建房间」需要重新发起，回到大厅
+  const hash = /^#\/room\/new/i.test(location.hash) ? '' : location.hash;
+  location.replace(target.origin + target.pathname + hash);
   return true;
 }
