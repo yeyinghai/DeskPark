@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### 修复
+
+- 旧版 Android WebView（如 83）打开 App 白屏：网页构建目标降到 Chrome 80 / Safari 14，并按需注入 core-js 补丁（`Array.prototype.at` 等），导师 Worker 单独补 `.at`。个别新式样式（如 `color-mix` 悬停色）在旧 WebView 上会退化，不影响使用。
+
 ### 新增
 
 - Android 应用（Capacitor）：GitHub Actions 自动打包 APK；联网时打开线上最新版本，离线时使用内置版本；原生语音报牌；App 内的邀请链接指向线上网页；联机页显示连接状态与服务器地址。

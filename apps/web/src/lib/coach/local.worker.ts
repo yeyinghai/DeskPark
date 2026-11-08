@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import './at-polyfill';
 import type { CoachMove } from '@park/engine';
 import { ch, xq } from '@park/engine';
 

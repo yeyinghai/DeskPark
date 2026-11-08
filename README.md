@@ -124,7 +124,7 @@ docker compose pull && docker compose up -d     # 打开 http://服务器IP:8787
 
 ### Android 应用
 
-每次推送 main，GitHub Actions 的 **Android** 工作流用 Capacitor 打包 APK（在该次运行的 Artifacts 里下载 `deskpark-android`；推送 `v*` 标签时附在 Release 上）。
+每次推送 main，GitHub Actions 的 **Android** 工作流用 Capacitor 打包 APK（在该次运行的 Artifacts 里下载 `deskpark-android`；推送 `v*` 标签时附在 Release 上）。网页按 Chrome 80 兼容构建，Android 系统 WebView 80 以上即可打开；更旧的手机请在应用商店更新「Android System WebView」。
 
 - 启动时探测服务器：联网就打开线上最新版本（新游戏随 Docker 更新自动生效，不用重装），连不上就进入 APK 内置的离线版，单人照常可玩。
 - 服务器地址默认 `https://deskpark.yeyhome.com:8666/`，可在仓库 Variables 设置 `ANDROID_PUBLIC_URL` / `ANDROID_SERVER_URL`，或手动运行工作流时填写。
